@@ -1,0 +1,42 @@
+{
+  "_lang": "ଓଡ଼ିଆ",
+  "resume": {
+    "builder": {
+      "title": "ରେଜ୍ୟୁମେ ବିଲ୍ଡର",
+      "subtitle": "ଆପଣଙ୍କ ସ୍କିଲ୍ ପାସପୋର୍ଟରୁ ଯାଞ୍ଚକୃତ ରେଜ୍ୟୁମେ",
+      "edit": "ଏଡିଟ୍",
+      "preview": "ପ୍ରିଭ୍ୟୁ",
+      "downloadPdf": "PDF ଡାଉନଲୋଡ୍",
+      "template": "ଟେମ୍ପ୍ଲେଟ୍"
+    },
+    "sections": {
+      "personalInfo":   "ବ୍ୟକ୍ତିଗତ ବିବରଣୀ",
+      "summary":        "ସାରାଂଶ",
+      "education":      "ଶିକ୍ଷା",
+      "skills":         "ଦକ୍ଷତା",
+      "certifications": "ସର୍ଟିଫିକେଟ୍",
+      "experience":     "କାର୍ଯ୍ୟ ଅନୁଭବ",
+      "languages":      "ଭାଷା",
+      "documents":      "ଡକୁମେଣ୍ଟ",
+      "references":     "ରେଫରେନ୍ସ"
+    },
+    "actions": {
+      "addSkill":       "ଦକ୍ଷତା ଯୋଗ",
+      "addEducation":   "ଶିକ୍ଷା ଯୋଗ",
+      "addExperience":  "ଅନୁଭବ ଯୋଗ",
+      "addCertificate": "ସର୍ଟିଫିକେଟ୍ ଯୋଗ",
+      "saveDraft":      "ଡ୍ରାଫ୍ଟ ସେଭ",
+      "download":       "ଡାଉନଲୋଡ୍"
+    },
+    "validation": {
+      "nameRequired":     "ପୁରା ନାମ ଦିଅନ୍ତୁ।",
+      "invalidPhone":     "୧୦ ଅଙ୍କିତ ସଠିକ ମୋବାଇଲ୍।",
+      "summaryTooShort":  "ସାରାଂଶ ଅତି କମ ୪୦ ଅକ୍ଷର।",
+      "startDateRequired":"ଆରମ୍ଭ ତାରିଖ ଆବଶ୍ୟକ।"
+    },
+    "status": {
+      "draftSaved":      "ଡ୍ରାଫ୍ଟ ସେଭ ହୋଇଛି",
+      "readyToDownload": "ଡାଉନଲୋଡ ପାଇଁ ପ୍ରସ୍ତୁତ"
+    }
+  }
+}

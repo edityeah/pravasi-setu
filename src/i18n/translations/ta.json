@@ -1,0 +1,42 @@
+{
+  "_lang": "தமிழ்",
+  "resume": {
+    "builder": {
+      "title": "ரெசூமே பில்டர்",
+      "subtitle": "உங்கள் திறன் பாஸ்போர்ட்டில் இருந்து சரிபார்க்கப்பட்ட ரெசூமே",
+      "edit": "திருத்து",
+      "preview": "முன்னோட்டம்",
+      "downloadPdf": "PDF பதிவிறக்கம்",
+      "template": "டெம்ப்ளேட்"
+    },
+    "sections": {
+      "personalInfo":   "தனிப்பட்ட விவரங்கள்",
+      "summary":        "சுருக்கம்",
+      "education":      "கல்வி",
+      "skills":         "திறன்கள்",
+      "certifications": "சான்றிதழ்கள்",
+      "experience":     "வேலை அனுபவம்",
+      "languages":      "மொழிகள்",
+      "documents":      "ஆவணங்கள்",
+      "references":     "பரிந்துரைகள்"
+    },
+    "actions": {
+      "addSkill":       "திறன் சேர்",
+      "addEducation":   "கல்வி சேர்",
+      "addExperience":  "அனுபவம் சேர்",
+      "addCertificate": "சான்றிதழ் சேர்",
+      "saveDraft":      "வரைவு சேமி",
+      "download":       "பதிவிறக்கம்"
+    },
+    "validation": {
+      "nameRequired":     "முழுப் பெயரை உள்ளிடவும்.",
+      "invalidPhone":     "10 இலக்க மொபைல் எண்.",
+      "summaryTooShort":  "சுருக்கம் குறைந்தது 40 எழுத்துகள்.",
+      "startDateRequired":"தொடக்க தேதி தேவை."
+    },
+    "status": {
+      "draftSaved":      "வரைவு சேமிக்கப்பட்டது",
+      "readyToDownload": "பதிவிறக்க தயார்"
+    }
+  }
+}

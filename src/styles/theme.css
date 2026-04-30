@@ -1,0 +1,33 @@
+/* SwiftChat-aligned typography utilities, Indic-aware.
+   Pages use Tailwind classes; raw CSS callers can use these. */
+
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+
+.text-title-large    { font: 700 16px/20px Montserrat, sans-serif; }
+.text-title-medium   { font: 600 16px/20px Montserrat, sans-serif; letter-spacing: 0.1px; }
+.text-label-medium   { font: 500 14px/20px Montserrat, sans-serif; letter-spacing: 0.1px; }
+.text-body-medium    { font: 400 14px/20px Montserrat, sans-serif; letter-spacing: 0.25px; }
+.text-caption        { font: 500 11px/14px Montserrat, sans-serif; letter-spacing: 0.2px; }
+.text-caption-small  { font: 400 10px/14px Montserrat, sans-serif; letter-spacing: 0.2px; }
+
+/* Indic twin styles: use whenever the rendered string contains Devanagari etc. */
+.text-body-indic     { font: 400 14px/22px Mukta, 'Noto Sans Devanagari', sans-serif; }
+.text-label-indic    { font: 500 14px/22px Mukta, 'Noto Sans Devanagari', sans-serif; }
+
+/* Trust/verified badge primitives */
+.badge-trust {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font: 700 10px/14px Montserrat, sans-serif;
+  background: var(--color-status-success-subtle);
+  color: var(--color-status-success);
+}
+.badge-flagged {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font: 700 10px/14px Montserrat, sans-serif;
+  background: var(--color-status-error-subtle);
+  color: var(--color-status-error);
+}

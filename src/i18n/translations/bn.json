@@ -1,0 +1,42 @@
+{
+  "_lang": "বাংলা",
+  "resume": {
+    "builder": {
+      "title": "রিজ্যুমে বিল্ডার",
+      "subtitle": "আপনার স্কিল পাসপোর্ট থেকে যাচাইকৃত রিজ্যুমে",
+      "edit": "এডিট",
+      "preview": "প্রিভিউ",
+      "downloadPdf": "PDF ডাউনলোড",
+      "template": "টেমপ্লেট"
+    },
+    "sections": {
+      "personalInfo":   "ব্যক্তিগত তথ্য",
+      "summary":        "সারাংশ",
+      "education":      "শিক্ষা",
+      "skills":         "দক্ষতা",
+      "certifications": "সার্টিফিকেট",
+      "experience":     "কাজের অভিজ্ঞতা",
+      "languages":      "ভাষা",
+      "documents":      "ডকুমেন্ট",
+      "references":     "রেফারেন্স"
+    },
+    "actions": {
+      "addSkill":       "দক্ষতা যোগ",
+      "addEducation":   "শিক্ষা যোগ",
+      "addExperience":  "অভিজ্ঞতা যোগ",
+      "addCertificate": "সার্টিফিকেট যোগ",
+      "saveDraft":      "ড্রাফট সেভ",
+      "download":       "ডাউনলোড"
+    },
+    "validation": {
+      "nameRequired":     "পুরো নাম দিন।",
+      "invalidPhone":     "১০ অঙ্কের সঠিক মোবাইল।",
+      "summaryTooShort":  "সারাংশ অন্তত ৪০ অক্ষর।",
+      "startDateRequired":"শুরুর তারিখ প্রয়োজন।"
+    },
+    "status": {
+      "draftSaved":      "ড্রাফট সেভ হয়েছে",
+      "readyToDownload": "ডাউনলোডের জন্য প্রস্তুত"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "_lang": "മലയാളം",
+  "resume": {
+    "builder": {
+      "title": "റെസ്യൂമെ ബിൽഡർ",
+      "subtitle": "നിങ്ങളുടെ സ്കിൽ പാസ്സ്പോർട്ടിൽ നിന്നു സാക്ഷ്യപ്പെടുത്തിയ റെസ്യൂമെ നിർമ്മിക്കുക",
+      "edit": "എഡിറ്റ്",
+      "preview": "പ്രിവ്യൂ",
+      "downloadPdf": "PDF ഡൗൺലോഡ്",
+      "template": "ടെംപ്ലേറ്റ്"
+    },
+    "sections": {
+      "personalInfo":   "വ്യക്തിഗത വിവരങ്ങൾ",
+      "summary":        "സംഗ്രഹം",
+      "education":      "വിദ്യാഭ്യാസം",
+      "skills":         "നൈപുണ്യങ്ങൾ",
+      "certifications": "സർട്ടിഫിക്കറ്റുകൾ",
+      "experience":     "തൊഴിൽ പരിചയം",
+      "languages":      "ഭാഷകൾ",
+      "documents":      "രേഖകൾ",
+      "references":     "റഫറൻസുകൾ"
+    },
+    "actions": {
+      "addSkill":       "നൈപുണ്യം ചേർക്കുക",
+      "addEducation":   "വിദ്യാഭ്യാസം ചേർക്കുക",
+      "addExperience":  "പരിചയം ചേർക്കുക",
+      "addCertificate": "സർട്ടിഫിക്കറ്റ് ചേർക്കുക",
+      "saveDraft":      "ഡ്രാഫ്റ്റ് സേവ്",
+      "download":       "ഡൗൺലോഡ്"
+    },
+    "validation": {
+      "nameRequired":     "പൂർണ്ണ പേര് നൽകുക.",
+      "invalidPhone":     "10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.",
+      "summaryTooShort":  "സംഗ്രഹം 40+ അക്ഷരങ്ങളാകട്ടെ.",
+      "startDateRequired":"തുടങ്ങിയ തീയതി ആവശ്യമാണ്."
+    },
+    "status": {
+      "draftSaved":      "ഡ്രാഫ്റ്റ് സേവ് ചെയ്തു",
+      "readyToDownload": "ഡൗൺലോഡിന് തയ്യാർ"
+    }
+  }
+}

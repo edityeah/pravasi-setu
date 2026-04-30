@@ -1,0 +1,42 @@
+{
+  "_lang": "हिन्दी",
+  "resume": {
+    "builder": {
+      "title": "रिज़्यूमे बिल्डर",
+      "subtitle": "अपने स्किल पासपोर्ट से सत्यापित रिज़्यूमे बनाइए",
+      "edit": "एडिट",
+      "preview": "देखें",
+      "downloadPdf": "PDF डाउनलोड",
+      "template": "टेम्पलेट"
+    },
+    "sections": {
+      "personalInfo":   "व्यक्तिगत जानकारी",
+      "summary":        "सारांश",
+      "education":      "शिक्षा",
+      "skills":         "कौशल",
+      "certifications": "प्रमाणपत्र",
+      "experience":     "कार्य अनुभव",
+      "languages":      "भाषाएँ",
+      "documents":      "दस्तावेज़",
+      "references":     "रेफरेंस"
+    },
+    "actions": {
+      "addSkill":       "कौशल जोड़ें",
+      "addEducation":   "शिक्षा जोड़ें",
+      "addExperience":  "अनुभव जोड़ें",
+      "addCertificate": "प्रमाणपत्र जोड़ें",
+      "saveDraft":      "ड्राफ़्ट सेव",
+      "download":       "डाउनलोड"
+    },
+    "validation": {
+      "nameRequired":     "पूरा नाम भरें।",
+      "invalidPhone":     "10 अंकों का सही मोबाइल नंबर भरें।",
+      "summaryTooShort":  "सारांश कम से कम 40 अक्षरों का हो।",
+      "startDateRequired":"प्रारंभ तिथि आवश्यक है।"
+    },
+    "status": {
+      "draftSaved":      "ड्राफ़्ट सेव हो गया",
+      "readyToDownload": "डाउनलोड के लिए तैयार"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+/* SwiftChat design tokens — semantic CSS variables.
+   These mirror the values exported via tailwind.config.js so non-Tailwind
+   surfaces (raw CSS, third-party widgets) can opt into the same palette. */
+
+:root {
+  /* Brand */
+  --color-brand-primary:          #386AF6;
+  --color-brand-primary-hover:    #2454D6;
+  --color-brand-primary-disabled: #C3D2FC;
+
+  /* Background */
+  --color-background-default:        #FFFFFF;
+  --color-background-app:            #F5F7FA;
+  --color-background-surface:        #ECECEC;
+  --color-background-surface-raised: #FFFFFF;
+  --color-background-brand:          #386AF6;
+  --color-background-brand-subtle:   #C3D2FC;
+  --color-surface:                   #FFFFFF;
+  --color-surface-subtle:            #F6F8FC;
+
+  /* Text */
+  --color-text-primary:    #0E0E0E;
+  --color-text-secondary:  #7383A5;
+  --color-text-tertiary:   #828996;
+  --color-text-disabled:   #999999;
+  --color-text-brand:      #386AF6;
+  --color-text-on-brand:   #FFFFFF;
+  --color-text-inverse:    #FFFFFF;
+
+  /* Border */
+  --color-border-default:  #D5D8DF;
+  --color-border-subtle:   #ECECEC;
+  --color-border-strong:   #999999;
+  --color-border-brand:    #345CCC;
+  --color-border-focus:    #386AF6;
+  --color-border-error:    #EB5757;
+
+  /* Interactive */
+  --color-interactive-primary:           #386AF6;
+  --color-interactive-primary-hover:     #1339A3;
+  --color-interactive-primary-active:    #2B3E8B;
+  --color-interactive-primary-disabled:  #C3D2FC;
+  --color-interactive-secondary:         #D5D8DF;
+  --color-interactive-destructive:       #EB5757;
+  --color-interactive-focus:             #386AF6;
+
+  /* Status */
+  --color-status-success:        #00BA34;
+  --color-status-success-subtle: #D4F5DC;
+  --color-status-warning:        #F8B200;
+  --color-status-warning-subtle: #FFF3CC;
+  --color-status-error:          #EB5757;
+  --color-status-error-subtle:   #FDEAEA;
+  --color-status-info:           #386AF6;
+  --color-status-info-subtle:    #E0E7FF;
+
+  /* Chat */
+  --color-chat-user-bubble:  #386AF6;
+  --color-chat-bot-bubble:   #ECECEC;
+  --color-chat-user-text:    #FFFFFF;
+  --color-chat-bot-text:     #0E0E0E;
+  --color-chat-input-bg:     #FFFFFF;
+  --color-chat-input-border: #D5D8DF;
+  --color-chat-timestamp:    #828996;
+
+  /* Spacing — scale exposed as variables for raw CSS callers. */
+  --space-2:   2px;
+  --space-4:   4px;
+  --space-8:   8px;
+  --space-12:  12px;
+  --space-16:  16px;
+  --space-24:  24px;
+  --space-32:  32px;
+  --space-48:  48px;
+  --space-64:  64px;
+  --space-128: 128px;
+
+  /* Radius */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  20px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-card:  0 1px 4px rgba(15, 23, 42, 0.06);
+  --shadow-modal: 0 8px 24px rgba(56, 106, 246, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(56, 106, 246, 0.25);
+}

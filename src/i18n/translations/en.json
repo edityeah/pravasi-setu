@@ -1,0 +1,42 @@
+{
+  "_lang": "English",
+  "resume": {
+    "builder": {
+      "title": "Resume Builder",
+      "subtitle": "Build a verified resume from your Skill Passport",
+      "edit": "Edit",
+      "preview": "Preview",
+      "downloadPdf": "Download PDF",
+      "template": "Template"
+    },
+    "sections": {
+      "personalInfo":   "Personal information",
+      "summary":        "Professional summary",
+      "education":      "Education",
+      "skills":         "Skills",
+      "certifications": "Certifications",
+      "experience":     "Work experience",
+      "languages":      "Languages",
+      "documents":      "Documents",
+      "references":     "References"
+    },
+    "actions": {
+      "addSkill":       "Add skill",
+      "addEducation":   "Add education",
+      "addExperience":  "Add work experience",
+      "addCertificate": "Add certificate",
+      "saveDraft":      "Save draft",
+      "download":       "Download"
+    },
+    "validation": {
+      "nameRequired":     "Enter your full name.",
+      "invalidPhone":     "Enter a valid 10-digit Indian mobile.",
+      "summaryTooShort":  "Summary should be at least 40 characters.",
+      "startDateRequired":"Start date is required."
+    },
+    "status": {
+      "draftSaved":      "Draft saved",
+      "readyToDownload": "Ready to download"
+    }
+  }
+}
