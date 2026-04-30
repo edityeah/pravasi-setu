@@ -11,6 +11,8 @@ export default function StatusBar({ dark = false }) {
   return <StatusBarChrome dark={dark} />
 }
 
+// Tailwind's `md:hidden` collapses the strip on viewports ≥ 768px, so the
+// faux network / wifi / battery row only ever shows on phone-width browsers.
 function StatusBarChrome({ dark }) {
   const [time, setTime] = useState(() =>
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -22,7 +24,7 @@ function StatusBarChrome({ dark }) {
   }, [])
 
   return (
-    <div className={`h-[22px] px-3.5 flex items-center justify-between text-[11px] font-bold flex-shrink-0 ${
+    <div className={`md:hidden h-[22px] px-3.5 flex items-center justify-between text-[11px] font-bold flex-shrink-0 ${
       dark ? 'bg-primary text-white' : 'bg-white text-txt-primary'
     }`}>
       <span>{time}</span>

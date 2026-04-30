@@ -6,49 +6,66 @@
 // keyword sets. Add an entry per feature; first match wins.
 
 import {
-  Briefcase, Wallet, Send, Calculator, ListChecks, Plane, AlertTriangle,
-  ShieldCheck, FileText, RotateCcw, Award, Bell, Building, Home as HomeIcon,
-  Phone, Receipt, Languages, Stethoscope, Shield, BookUser
+  Briefcase, Wallet, BadgeIndianRupee, Calculator, ListChecks, Plane, AlertTriangle,
+  FileText, RotateCcw, Award, Bell, Building, Home as HomeIcon,
+  Siren, Receipt, Shield, BookUser, Sparkles, ClipboardList
 } from 'lucide-react'
+
+// Tone palette — each tile picks a different colour family so the grid reads
+// as a colourful menu instead of a wall of blue. Backgrounds stay light tints
+// (no eye-strain); icons take the saturated colour. Defined here so both the
+// welcome grid and intent reply cards stay consistent.
+export const TONES = {
+  blue:    { bg: 'bg-blue-100',    fg: 'text-blue-600' },
+  emerald: { bg: 'bg-emerald-100', fg: 'text-emerald-600' },
+  rose:    { bg: 'bg-rose-100',    fg: 'text-rose-600' },
+  amber:   { bg: 'bg-amber-100',   fg: 'text-amber-700' },
+  violet:  { bg: 'bg-violet-100',  fg: 'text-violet-700' },
+  sky:     { bg: 'bg-sky-100',     fg: 'text-sky-600' },
+  teal:    { bg: 'bg-teal-100',    fg: 'text-teal-700' },
+  indigo:  { bg: 'bg-indigo-100',  fg: 'text-indigo-600' },
+  red:     { bg: 'bg-red-100',     fg: 'text-red-600' },
+  fuchsia: { bg: 'bg-fuchsia-100', fg: 'text-fuchsia-700' },
+}
 
 // Apps a user can invoke directly from chat.
 // `target` matches keys in App.jsx ROUTES so CanvasPanel can render them.
 export const APPS = [
-  { id: 'jobs',               target: 'jobs',               icon: Briefcase,     title: 'Find Jobs',          summary: 'Verified migrant jobs across GCC + SE Asia',
+  { id: 'jobs',               target: 'jobs',               icon: Briefcase,         tone: 'blue',    title: 'Find Jobs',          summary: 'Verified migrant jobs across GCC + SE Asia',
     keys: ['job', 'jobs', 'work', 'employment abroad', 'find job', 'opening', 'vacancy', 'electrician', 'nurse', 'plumber', 'driver', 'welder', 'helper'] },
-  { id: 'remittance',         target: 'remittance',         icon: Send,          title: 'Send Money',         summary: 'Compare rates, send INR home in minutes',
+  { id: 'remittance',         target: 'remittance',         icon: BadgeIndianRupee,  tone: 'emerald', title: 'Send Money',         summary: 'Compare rates, send INR home in minutes',
     keys: ['send money', 'remittance', 'remit', 'transfer', 'wire', 'wise', 'home transfer', 'aed to inr', 'qar to inr'] },
-  { id: 'transferTracker',    target: 'transferTracker',    icon: Receipt,       title: 'Track Transfers',    summary: 'Status of past money transfers',
+  { id: 'transferTracker',    target: 'transferTracker',    icon: Receipt,           tone: 'violet',  title: 'Track Transfers',    summary: 'Status of past money transfers',
     keys: ['track transfer', 'my transfers', 'track money', 'transfer history', 'where is my money'] },
-  { id: 'calculator',         target: 'calculator',         icon: Calculator,    title: 'Cost Calculator',    summary: 'Visa + agent + travel + living estimates',
+  { id: 'calculator',         target: 'calculator',         icon: Calculator,        tone: 'amber',   title: 'Cost Calculator',    summary: 'Visa + agent + travel + living estimates',
     keys: ['cost', 'how much', 'calculator', 'estimate', 'budget', 'afford', 'expense'] },
-  { id: 'predeparture',       target: 'predeparture',       icon: ListChecks,    title: 'Pre-Departure',      summary: 'Documents, vaccines, insurance, language',
+  { id: 'predeparture',       target: 'predeparture',       icon: ListChecks,        tone: 'indigo',  title: 'Pre-Departure',      summary: 'Documents, vaccines, insurance, language',
     keys: ['pre departure', 'predeparture', 'before travel', 'checklist', 'documents', 'pcc', 'vaccine', 'gamca'] },
-  { id: 'postarrival',        target: 'postarrival',        icon: HomeIcon,      title: 'Post-Arrival',       summary: 'Housing, SIM, transport, embassy',
+  { id: 'postarrival',        target: 'postarrival',        icon: HomeIcon,          tone: 'teal',    title: 'Post-Arrival',       summary: 'Housing, SIM, transport, embassy',
     keys: ['after arrival', 'post arrival', 'housing', 'sim', 'transport', 'community', 'embassy', 'arrival'] },
-  { id: 'grievance',          target: 'grievance',          icon: AlertTriangle, title: 'Grievance',          summary: 'Raise + track complaints with embassy / MEA',
+  { id: 'grievance',          target: 'grievance',          icon: AlertTriangle,     tone: 'rose',    title: 'Grievance',          summary: 'Raise + track complaints with embassy / MEA',
     keys: ['grievance', 'complaint', 'not paying', 'salary delay', 'employer issue', 'abuse', 'unsafe', 'cheating'] },
-  { id: 'emergency',          target: 'emergency',          icon: Phone,         title: 'Emergency',          summary: '24×7 embassy + MADAD helplines',
+  { id: 'emergency',          target: 'emergency',          icon: Siren,             tone: 'red',     title: 'Emergency',          summary: '24×7 embassy + MADAD helplines',
     keys: ['emergency', 'urgent help', 'sos', 'help me now', 'in danger', '999', 'embassy contact'] },
-  { id: 'passport',           target: 'passport',           icon: Award,         title: 'Skill Passport',     summary: 'Verifiable digital resume + QR',
+  { id: 'passport',           target: 'passport',           icon: Award,             tone: 'fuchsia', title: 'Skill Passport',     summary: 'Verifiable digital resume + QR',
     keys: ['skill passport', 'my profile', 'verify skill', 'show resume', 'show passport'] },
-  { id: 'resumeBuilder',      target: 'resumeBuilder',      icon: FileText,      title: 'Resume Builder',     summary: 'Edit, preview & download resume PDF',
+  { id: 'resumeBuilder',      target: 'resumeBuilder',      icon: FileText,          tone: 'indigo',  title: 'Resume Builder',     summary: 'Edit, preview & download resume PDF',
     keys: ['resume', 'cv', 'build resume', 'edit resume', 'download resume', 'export pdf'] },
-  { id: 'profileSetup',       target: 'profileSetup',       icon: BookUser,      title: 'Profile Setup',      summary: 'Aadhaar, APAAR, DigiLocker',
+  { id: 'profileSetup',       target: 'profileSetup',       icon: BookUser,          tone: 'blue',    title: 'Profile Setup',      summary: 'Aadhaar, APAAR, DigiLocker',
     keys: ['profile setup', 'create profile', 'register me', 'sign up'] },
-  { id: 'loans',              target: 'loans',              icon: Wallet,        title: 'Migration Loans',    summary: 'Pre-approved loans for visa + travel',
+  { id: 'loans',              target: 'loans',              icon: Wallet,            tone: 'emerald', title: 'Migration Loans',    summary: 'Pre-approved loans for visa + travel',
     keys: ['loan', 'borrow', 'finance', 'credit'] },
-  { id: 'insurance',          target: 'insurance',          icon: Shield,        title: 'Insurance (PBBY)',   summary: 'PBBY + private health/travel cover',
+  { id: 'insurance',          target: 'insurance',          icon: Shield,            tone: 'sky',     title: 'Insurance (PBBY)',   summary: 'PBBY + private health/travel cover',
     keys: ['insurance', 'pbby', 'health cover', 'travel insurance'] },
-  { id: 'travel',             target: 'travel',             icon: Plane,         title: 'Travel Bookings',    summary: 'Flights + visa + airport transfers',
+  { id: 'travel',             target: 'travel',             icon: Plane,             tone: 'sky',     title: 'Travel Bookings',    summary: 'Flights + visa + airport transfers',
     keys: ['flight', 'ticket', 'travel', 'book ticket', 'airline'] },
-  { id: 'employment',         target: 'employment',         icon: Building,      title: 'My Employment',      summary: 'Payslips, contract, attendance',
+  { id: 'employment',         target: 'employment',         icon: Building,          tone: 'amber',   title: 'My Employment',      summary: 'Payslips, contract, attendance',
     keys: ['my employment', 'payslip', 'salary slip', 'attendance', 'my contract'] },
-  { id: 'applicationTracker', target: 'applicationTracker', icon: ListChecks,    title: 'My Applications',    summary: 'Status of jobs you applied to',
+  { id: 'applicationTracker', target: 'applicationTracker', icon: ClipboardList,     tone: 'violet',  title: 'My Applications',    summary: 'Status of jobs you applied to',
     keys: ['my applications', 'applied jobs', 'application status', 'where is my application'] },
-  { id: 'return',             target: 'return',             icon: RotateCcw,     title: 'Return to India',    summary: 'Visa closure, ticket, India jobs',
+  { id: 'return',             target: 'return',             icon: RotateCcw,         tone: 'rose',    title: 'Return to India',    summary: 'Visa closure, ticket, India jobs',
     keys: ['return', 'come back', 'home india', 'reintegration', 'after contract'] },
-  { id: 'updates',            target: 'updates',            icon: Bell,          title: 'Updates & Alerts',   summary: 'Job, visa, payment, fraud alerts',
+  { id: 'updates',            target: 'updates',            icon: Bell,              tone: 'amber',   title: 'Updates & Alerts',   summary: 'Job, visa, payment, fraud alerts',
     keys: ['updates', 'alerts', 'notification', 'fraud alert'] },
 ]
 

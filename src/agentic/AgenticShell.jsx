@@ -236,6 +236,7 @@ export default function AgenticShell() {
               </div>
               <WelcomeView
                 profile={profile}
+                onSend={(s) => handleSend(s)}
                 onStarter={(s) => handleSend(s)}
                 onApp={handleStarterApp}
               />

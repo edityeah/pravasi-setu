@@ -19,7 +19,7 @@ export default function BottomNav() {
   if (embedded) return null
 
   return (
-    <div className="border-t border-bdr-light flex-shrink-0 bg-white shadow-bottom">
+    <div className="md:hidden border-t border-bdr-light flex-shrink-0 bg-white shadow-bottom">
       <div className="h-16 flex items-stretch max-w-screen-md mx-auto w-full relative">
         {TABS.map(tab => {
           const active = screen === tab.id
