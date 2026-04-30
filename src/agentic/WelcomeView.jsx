@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { APPS, TONES } from './intentRouter'
 import { Sparkles, Mic, Send, ChevronRight } from 'lucide-react'
 import PartnerStrip from '../components/PartnerStrip'
+import VoiceAgentButton from './voice/VoiceAgentButton'
 import { useApp } from '../context/AppContext'
 
 const STARTERS = [
@@ -43,6 +44,9 @@ export default function WelcomeView({ profile, onStarter, onApp, onSend }) {
             <p className="text-[13px] text-txt-secondary mt-3 max-w-[480px]">
               Type below or pick an app — jobs, money transfers, documents, grievances. I'll surface the right tool inside this chat.
             </p>
+            <div className="mt-5">
+              <VoiceAgentButton label="Talk to Pravasi Setu Assistant" />
+            </div>
           </div>
 
           {/* App picker — colour-toned tiles */}

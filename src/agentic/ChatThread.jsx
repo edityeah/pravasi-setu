@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from 'react'
-import { Mic, Send, Bot, ChevronRight, PanelRight, Bell } from 'lucide-react'
+import { Mic, Send, Bot, ChevronRight, PanelRight, Bell, Phone } from 'lucide-react'
 import { getAppById } from './intentRouter'
 import Logo from '../components/Logo'
 import { useApp } from '../context/AppContext'
+import { useVoiceCall } from './voice/VoiceCallProvider'
 
 // Center column: thread of messages + composer at bottom. Bot messages can
 // carry one or more `canvasInvocations` — buttons the user can click to open
@@ -10,6 +11,7 @@ import { useApp } from '../context/AppContext'
 
 export default function ChatThread({ thread, onSend, onOpenApp, onOpenFull, onToggleCanvas, onOpenNotifications }) {
   const { showToast } = useApp()
+  const { startCall } = useVoiceCall()
   const [val, setVal] = React.useState('')
   const scrollRef = useRef(null)
   const messages = thread?.messages || []
@@ -40,6 +42,14 @@ export default function ChatThread({ thread, onSend, onOpenApp, onOpenFull, onTo
             <span className="w-1.5 h-1.5 rounded-full bg-ok inline-block" /> Online · Multilingual
           </div>
         </div>
+        <button
+          onClick={startCall}
+          className="inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white text-[12px] font-bold transition-colors"
+          aria-label="Talk to Setu"
+          title="Talk to Setu"
+        >
+          <Phone size={13} /> <span className="hidden sm:inline">Talk to Setu</span>
+        </button>
         {onToggleCanvas && (
           <button
             onClick={onToggleCanvas}

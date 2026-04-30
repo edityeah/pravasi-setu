@@ -1,1 +1,9 @@
 node_modules
+dist
+.DS_Store
+.vercel
+
+# Local environment — never commit. Use Vercel project settings in production.
+.env
+.env.local
+.env.*.local

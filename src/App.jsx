@@ -1,6 +1,9 @@
 import React from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import Toast from './components/Toast'
+import { VoiceCallProvider } from './agentic/voice/VoiceCallProvider'
+import VoiceAgentModal from './agentic/voice/VoiceAgentModal'
+import CallStatusPill from './agentic/voice/CallStatusPill'
 
 import AgenticShell               from './agentic/AgenticShell'
 import SplashPage                  from './pages/SplashPage'
@@ -78,6 +81,11 @@ function AppRoutes() {
     <div className="relative h-screen w-screen overflow-hidden bg-surface-secondary flex flex-col">
       <Page key={screen} />
       <Toast />
+      {/* Persistent voice call surfaces — pill is always visible while a call
+          runs; modal is the optional expanded view. The call lives in
+          VoiceCallProvider so it survives navigation between screens. */}
+      <CallStatusPill />
+      <VoiceAgentModal />
     </div>
   )
 }
@@ -85,7 +93,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <AppProvider>
-      <AppRoutes />
+      <VoiceCallProvider>
+        <AppRoutes />
+      </VoiceCallProvider>
     </AppProvider>
   )
 }
