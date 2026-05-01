@@ -283,18 +283,36 @@ export const FUNDING_METHODS = [
 ]
 
 // Sample partner brands — labelled clearly as prototype/mock partners.
+//
+// Fee model anchored to real AED→INR corridor data (late 2025):
+//   - midRate is the mid-market reference (interbank). UI computes the
+//     provider's effective rate as midRate × (1 - spread).
+//   - spreadPct is the FX margin baked into the customer-facing rate.
+//   - feeAed is a FIXED fee in source currency (AED) charged on top.
+//
+// Effective cost % displayed to the user is:
+//     (feeAed / sourceAmount) + spreadPct
+// which matches Wise's published "comparison" methodology and lets a worker
+// compare apples-to-apples regardless of how each provider hides cost.
+//
+// Defensible rounded values per late-2025 research:
+//   Wise ~0.7%, NPCI/UPI ~1.5%, Remitly ~1%, WorldRemit ~2%, ICICI ~2.5%,
+//   MoneyGram ~4%, Western Union ~4%, SBI bank wire ~6%.
 export const REMITTANCE_PROVIDERS = [
-  { id: 'sbi',   name: 'SBI',                 rate: 22.85, fee: 150, time: '1–2 days', logo: '🏦', tag: 'Mock regulated partner' },
-  { id: 'wu',    name: 'Western Union',       rate: 22.78, fee: 200, time: '< 1 hr',   logo: '💸', tag: 'Prototype partner' },
-  { id: 'wise',  name: 'Wise',                rate: 22.92, fee: 90,  time: '< 1 hr',   logo: '🟢', tag: 'Prototype partner', best: true },
-  { id: 'rmly',  name: 'Remitly',             rate: 22.88, fee: 0,   time: '< 30 min', logo: '🟣', tag: 'Prototype partner' },
-  { id: 'icici', name: 'ICICI Money2India',   rate: 22.80, fee: 100, time: 'Same day', logo: '🏛️', tag: 'Mock regulated partner' },
-  { id: 'mg',    name: 'MoneyGram',           rate: 22.74, fee: 250, time: '< 1 hr',   logo: '🟠', tag: 'Prototype partner' },
-  { id: 'wr',    name: 'WorldRemit',          rate: 22.83, fee: 110, time: '< 1 hr',   logo: '🔵', tag: 'Prototype partner' },
-  { id: 'npci',  name: 'NPCI UPI Foreign Inward', rate: 22.95, fee: 0, time: 'In minutes', logo: '🇮🇳', tag: 'Integration-ready' },
+  { id: 'wise',  name: 'Wise',                  spreadPct: 0.004, feeAed: 6,  time: 'In minutes',  logo: '🟢', tag: 'Prototype partner', highlight: 'Closest to mid-market' },
+  { id: 'npci',  name: 'NPCI UPI Foreign Inward', spreadPct: 0.010, feeAed: 0,  time: 'Seconds',    logo: '🇮🇳', tag: 'Integration-ready', highlight: 'Zero fee · seconds' },
+  { id: 'rmly',  name: 'Remitly Economy',        spreadPct: 0.008, feeAed: 0,  time: '3–5 days',    logo: '🟣', tag: 'Prototype partner', highlight: 'Free over AED 400' },
+  { id: 'wr',    name: 'WorldRemit',             spreadPct: 0.015, feeAed: 6,  time: '< 1 hour',    logo: '🔵', tag: 'Prototype partner' },
+  { id: 'icici', name: 'ICICI Money2India',      spreadPct: 0.022, feeAed: 0,  time: 'Same day',    logo: '🏛️', tag: 'Mock regulated partner', highlight: 'Fee waived' },
+  { id: 'mg',    name: 'MoneyGram',              spreadPct: 0.025, feeAed: 14, time: '< 1 hour',    logo: '🟠', tag: 'Prototype partner' },
+  { id: 'wu',    name: 'Western Union',          spreadPct: 0.025, feeAed: 12, time: '< 1 hour',    logo: '💸', tag: 'Prototype partner' },
+  { id: 'sbi',   name: 'SBI bank wire',          spreadPct: 0.040, feeAed: 75, time: '1–3 days',    logo: '🏦', tag: 'Mock regulated partner' },
 ]
 
 // Source & destination corridors. India is the only destination for this prototype.
+// `rate` is the mid-market reference (interbank). The provider's effective
+// rate is mid × (1 - spreadPct). UI does this multiplication explicitly so
+// the user sees both the headline rate AND the FX margin baked into it.
 export const SOURCE_COUNTRIES = [
   { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', currency: 'AED', rate: 22.92 },
   { code: 'SA', name: 'Saudi Arabia',         flag: '🇸🇦', currency: 'SAR', rate: 22.34 },
@@ -305,6 +323,31 @@ export const SOURCE_COUNTRIES = [
   { code: 'US', name: 'United States',        flag: '🇺🇸', currency: 'USD', rate: 83.20 },
   { code: 'GB', name: 'United Kingdom',       flag: '🇬🇧', currency: 'GBP', rate: 105.80 },
 ]
+
+// Pure helpers for the new comparison math. Kept here next to the data so
+// consumers (RemittancePage QuoteStep + ReviewStep + Summary) all share the
+// exact same formula and never disagree on what the recipient actually gets.
+export function computeQuote({ midRate, sourceAmount, spreadPct, feeAed }) {
+  const effectiveRate = +(midRate * (1 - (spreadPct || 0))).toFixed(4)
+  const amountAfterFee = Math.max(0, sourceAmount - (feeAed || 0))
+  const receiveAmount  = Math.round(amountAfterFee * effectiveRate)
+  // What the user WOULD have gotten at mid-market with zero fee.
+  const midReceive     = Math.round(sourceAmount * midRate)
+  const totalCostInr   = Math.max(0, midReceive - receiveAmount)
+  const totalCostPct   = sourceAmount > 0 ? (totalCostInr / midReceive) * 100 : 0
+  const fxLossInr      = Math.round(amountAfterFee * (midRate - effectiveRate))
+  const feeInr         = Math.round((feeAed || 0) * effectiveRate)
+  return {
+    effectiveRate,
+    amountAfterFee,
+    receiveAmount,
+    midReceive,
+    totalCostInr,
+    totalCostPct,
+    fxLossInr,   // INR equivalent of the FX margin
+    feeInr,      // INR equivalent of the fixed fee
+  }
+}
 
 export const TRANSFER_PURPOSES = [
   'Family maintenance',

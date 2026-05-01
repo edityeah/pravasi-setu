@@ -9,6 +9,7 @@ import {
   RECIPIENTS, PAYOUT_METHODS, FUNDING_METHODS, REMITTANCE_PROVIDERS,
   SOURCE_COUNTRIES, TRANSFER_PURPOSES,
   AFFILIATED_PAYOUT_BANKS, CASH_PICKUP_AGENTS,
+  computeQuote,
 } from '../data/mockData'
 import {
   ArrowDownUp, Send, Clock, ShieldCheck, ChevronRight, CheckCircle2, Lock,
@@ -37,9 +38,17 @@ export default function RemittancePage() {
   const [sourceAmount, setSourceAmount] = useState(500)
   const [providerId, setProviderId] = useState('wise')
   const provider = REMITTANCE_PROVIDERS.find(p => p.id === providerId) || REMITTANCE_PROVIDERS[0]
-  const fxRate = provider.rate || sourceCountry.rate
-  const fee = provider.fee
-  const receiveAmount = Math.max(0, Math.round(sourceAmount * fxRate - fee))
+  // Single source of truth for the math — also used by every comparison row
+  // and the review screen. Effective rate = mid × (1 - spreadPct).
+  const quote = computeQuote({
+    midRate:      sourceCountry.rate,
+    sourceAmount,
+    spreadPct:    provider.spreadPct,
+    feeAed:       provider.feeAed,
+  })
+  const fxRate        = quote.effectiveRate
+  const fee           = provider.feeAed
+  const receiveAmount = quote.receiveAmount
 
   // ── Method
   const [payout, setPayout] = useState('UPI')
@@ -150,7 +159,7 @@ export default function RemittancePage() {
             {step === 0 && <QuoteStep
               sourceCountry={sourceCountry} setSourceCode={setSourceCode}
               sourceAmount={sourceAmount} setSourceAmount={setSourceAmount}
-              fxRate={fxRate} fee={fee} receiveAmount={receiveAmount}
+              quote={quote}
               providerId={providerId} setProviderId={setProviderId}
             />}
             {step === 1 && <MethodStep payout={payout} setPayout={setPayout} sourceAmount={sourceAmount} fxRate={fxRate} />}
@@ -241,7 +250,22 @@ export default function RemittancePage() {
 
 /* ───────────────────────── STEPS ───────────────────────── */
 
-function QuoteStep({ sourceCountry, setSourceCode, sourceAmount, setSourceAmount, fxRate, fee, receiveAmount, providerId, setProviderId }) {
+function QuoteStep({ sourceCountry, setSourceCode, sourceAmount, setSourceAmount, quote, providerId, setProviderId }) {
+  // Pre-compute every provider's quote at the *current* sourceAmount so the
+  // comparison rows reflect the user's actual transfer size — not a fixed
+  // demo amount. Sorted by what the recipient actually gets, descending.
+  const ranked = REMITTANCE_PROVIDERS.map(p => ({
+    p,
+    q: computeQuote({
+      midRate: sourceCountry.rate,
+      sourceAmount,
+      spreadPct: p.spreadPct,
+      feeAed: p.feeAed,
+    }),
+  })).sort((a, b) => b.q.receiveAmount - a.q.receiveAmount)
+  const bestId = ranked[0]?.p.id
+  const cheapestCostInr = ranked[0]?.q.totalCostInr ?? 0
+
   return (
     <>
       <div className="bg-white p-5 lg:rounded-card lg:shadow-card">
@@ -289,13 +313,33 @@ function QuoteStep({ sourceCountry, setSourceCode, sourceAmount, setSourceAmount
           <div className="text-[10px] text-txt-secondary font-semibold uppercase mb-2 mt-1">Recipient gets</div>
           <div className="flex items-center gap-2 pt-3">
             <span className="text-[18px]">🇮🇳</span>
-            <div className="flex-1 text-[24px] font-extrabold text-primary">₹{receiveAmount.toLocaleString()}</div>
+            <div className="flex-1 text-[24px] font-extrabold text-primary">₹{quote.receiveAmount.toLocaleString()}</div>
             <span className="text-[13px] font-bold text-txt-secondary">INR</span>
           </div>
-          <div className="text-[10px] text-txt-tertiary mt-1 flex flex-wrap gap-x-3">
-            <span>Rate: 1 {sourceCountry.currency} = ₹{fxRate}</span>
-            <span>· Fee: ₹{fee}</span>
-            <span>· Rate locked for 5 min</span>
+          <div className="text-[10px] text-txt-tertiary mt-1">
+            Rate locked for 5 min
+          </div>
+        </div>
+
+        {/* ── Math breakdown ──────────────────────────────────────────
+            Spelled out line by line so the worker can see every rupee:
+            we start from sourceAmount × mid, subtract the FX margin and
+            the fixed fee, and end at what actually lands in INR. */}
+        <div className="mt-3 border border-bdr rounded-card p-3 bg-surface-secondary/40">
+          <div className="text-[11px] font-bold text-txt-secondary uppercase mb-2">How we got to ₹{quote.receiveAmount.toLocaleString()}</div>
+          <BreakdownRow label={`At mid-market rate (₹${sourceCountry.rate} / ${sourceCountry.currency})`} value={`₹${quote.midReceive.toLocaleString()}`} />
+          <BreakdownRow label="− Provider FX margin" value={`− ₹${quote.fxLossInr.toLocaleString()}`} muted />
+          <BreakdownRow label={`− Fixed transfer fee (${sourceCountry.currency} ${REMITTANCE_PROVIDERS.find(p=>p.id===providerId)?.feeAed ?? 0})`} value={`− ₹${quote.feeInr.toLocaleString()}`} muted />
+          <div className="border-t border-bdr my-2" />
+          <BreakdownRow label="Recipient gets" value={`₹${quote.receiveAmount.toLocaleString()}`} bold />
+          <div className="mt-2 pt-2 border-t border-bdr/60 flex items-center justify-between text-[10px]">
+            <span className="text-txt-secondary">Total cost (fee + FX margin)</span>
+            <span className="font-bold text-warn-text">
+              ₹{quote.totalCostInr.toLocaleString()} · {quote.totalCostPct.toFixed(2)}%
+            </span>
+          </div>
+          <div className="text-[10px] text-txt-tertiary mt-1.5">
+            Effective rate: 1 {sourceCountry.currency} = ₹{quote.effectiveRate} · Mid-market: ₹{sourceCountry.rate}
           </div>
         </div>
       </div>
@@ -303,34 +347,68 @@ function QuoteStep({ sourceCountry, setSourceCode, sourceAmount, setSourceAmount
       <div className="bg-white p-5 lg:rounded-card lg:shadow-card">
         <div className="text-[13px] font-bold text-txt-primary mb-2 flex items-center justify-between">
           <span>Compare providers</span>
-          <span className="text-[10px] text-ok font-bold">Best rate first</span>
+          <span className="text-[10px] text-ok font-bold">Cheapest first · for {sourceCountry.currency} {sourceAmount.toLocaleString()}</span>
         </div>
         <div className="space-y-2">
-          {REMITTANCE_PROVIDERS.slice().sort((a, b) => b.rate - a.rate).map(p => (
-            <button
-              key={p.id}
-              onClick={() => setProviderId(p.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-card border-2 text-left ${
-                providerId === p.id ? 'border-primary bg-primary-50' : 'border-bdr bg-white'
-              }`}
-            >
-              <span className="text-[22px]">{p.logo}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 flex-wrap">
-                  <div className="text-[13px] font-bold text-txt-primary truncate">{p.name}</div>
-                  {p.best && <span className="px-1.5 py-0.5 rounded-pill bg-ok-light text-ok text-[9px] font-bold">BEST</span>}
+          {ranked.map(({ p, q }) => {
+            const isSel  = providerId === p.id
+            const isBest = p.id === bestId
+            const savedVsThis = Math.max(0, q.totalCostInr - cheapestCostInr) // ₹ extra vs cheapest
+            return (
+              <button
+                key={p.id}
+                onClick={() => setProviderId(p.id)}
+                className={`w-full p-3 rounded-card border-2 text-left transition-colors ${
+                  isSel ? 'border-primary bg-primary-50' : 'border-bdr bg-white hover:border-primary/40'
+                }`}
+              >
+                {/* Top row: name + tags + recipient receives */}
+                <div className="flex items-start gap-3">
+                  <span className="text-[22px] leading-none mt-0.5">{p.logo}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="text-[13px] font-bold text-txt-primary truncate">{p.name}</div>
+                      {isBest && <span className="px-1.5 py-0.5 rounded-pill bg-ok-light text-ok text-[9px] font-bold">CHEAPEST</span>}
+                      {p.highlight && !isBest && <span className="px-1.5 py-0.5 rounded-pill bg-info-light text-info text-[9px] font-bold">{p.highlight.toUpperCase()}</span>}
+                    </div>
+                    <div className="text-[10px] text-txt-tertiary flex items-center gap-2 flex-wrap mt-0.5">
+                      <span className="flex items-center gap-0.5"><Clock size={9} /> {p.time}</span>
+                      <span>·</span>
+                      <span>{p.tag}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-txt-tertiary uppercase">Receives</div>
+                    <div className="text-[14px] font-extrabold text-txt-primary">₹{q.receiveAmount.toLocaleString()}</div>
+                  </div>
                 </div>
-                <div className="text-[10px] text-txt-tertiary flex flex-wrap gap-x-2">
-                  <span>₹{p.rate}</span><span>· Fee ₹{p.fee}</span>
-                  <span className="flex items-center gap-0.5"><Clock size={9} /> {p.time}</span>
-                  <span className="text-info">· {p.tag}</span>
+
+                {/* Bottom row: explicit math — fee, spread, total cost */}
+                <div className="mt-2.5 grid grid-cols-3 gap-2 pt-2.5 border-t border-bdr-light">
+                  <Metric label="Rate" value={`₹${q.effectiveRate}`} sub={`mid ₹${sourceCountry.rate}`} />
+                  <Metric
+                    label="Fee"
+                    value={p.feeAed === 0 ? 'Free' : `${sourceCountry.currency} ${p.feeAed}`}
+                    sub={p.feeAed === 0 ? '—' : `≈ ₹${q.feeInr.toLocaleString()}`}
+                    tone={p.feeAed === 0 ? 'ok' : undefined}
+                  />
+                  <Metric
+                    label="Total cost"
+                    value={`${q.totalCostPct.toFixed(2)}%`}
+                    sub={`₹${q.totalCostInr.toLocaleString()}`}
+                    tone={q.totalCostPct < 1 ? 'ok' : q.totalCostPct < 2.5 ? undefined : 'warn'}
+                  />
                 </div>
-              </div>
-              <div className="text-right text-[13px] font-extrabold text-txt-primary">
-                ₹{Math.max(0, Math.round(800 * p.rate - p.fee)).toLocaleString()}
-              </div>
-            </button>
-          ))}
+
+                {/* Foot row: only on non-cheapest, show "you'd pay ₹X more" */}
+                {!isBest && savedVsThis > 0 && (
+                  <div className="mt-2 text-[10.5px] font-semibold text-warn-text">
+                    ₹{savedVsThis.toLocaleString()} more than the cheapest
+                  </div>
+                )}
+              </button>
+            )
+          })}
         </div>
       </div>
     </>
@@ -725,6 +803,33 @@ function Summary({ sourceCountry, sourceAmount, fxRate, fee, receiveAmount, prov
         <Pill label="Method"   value={payout || '—'} />
       </div>
       <div className="text-[10px] opacity-80 mt-2">via {provider.name} · {provider.tag}</div>
+    </div>
+  )
+}
+
+// Single line in the math breakdown ("at mid-market", "minus FX margin",
+// "minus fee", "recipient gets"). Bold when it's the totals line, muted on
+// the subtractions so the eye lands on the green final number.
+function BreakdownRow({ label, value, muted, bold }) {
+  return (
+    <div className="flex items-center justify-between text-[11.5px] py-0.5">
+      <span className={muted ? 'text-txt-tertiary' : 'text-txt-secondary'}>{label}</span>
+      <span className={`font-mono tabular-nums ${bold ? 'font-extrabold text-primary text-[13px]' : muted ? 'text-txt-secondary' : 'text-txt-primary'}`}>
+        {value}
+      </span>
+    </div>
+  )
+}
+
+// Compact metric used in the per-provider compare row: 3-column grid of
+// Rate / Fee / Total cost%. Tone is what colours the number.
+function Metric({ label, value, sub, tone }) {
+  const valueCls = tone === 'ok' ? 'text-ok' : tone === 'warn' ? 'text-warn-text' : 'text-txt-primary'
+  return (
+    <div className="text-left">
+      <div className="text-[9.5px] text-txt-tertiary uppercase tracking-wide">{label}</div>
+      <div className={`text-[12px] font-extrabold ${valueCls} leading-tight`}>{value}</div>
+      {sub && <div className="text-[9.5px] text-txt-tertiary">{sub}</div>}
     </div>
   )
 }
