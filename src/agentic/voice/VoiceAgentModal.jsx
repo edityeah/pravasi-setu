@@ -1,5 +1,8 @@
 import React from 'react'
-import { Mic, MicOff, PhoneOff, X, AlertCircle, Loader2, Phone, Minimize2 } from 'lucide-react'
+import {
+  Mic, MicOff, PhoneOff, X, AlertCircle, Loader2, Phone, Minimize2,
+  Monitor, MonitorOff, ShieldAlert, Eye,
+} from 'lucide-react'
 import { useVoiceCall, formatCallDuration } from './VoiceCallProvider'
 import Logo from '../../components/Logo'
 
@@ -101,6 +104,13 @@ export default function VoiceAgentModal() {
               <Minimize2 size={12} /> Keep talking while I navigate the app
             </button>
           )}
+
+          {/* ── Screen sharing ─────────────────────────────────────────
+              Lets the user share their tab/window so Setu can see what they
+              see. Frames are sampled every ~3s, summarised by GPT-4o vision
+              behind /api/analyze-screen, and the summary is injected back
+              into the realtime session as silent visual context. */}
+          {callLive && <ScreenShareBlock v={v} />}
 
           {/* Live captions — last 3 turns. */}
           {v.transcript.length > 0 && (
@@ -207,6 +217,102 @@ function SpeakingBars() {
         />
       ))}
       <style>{`@keyframes setuBar { 0%,100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }`}</style>
+    </div>
+  )
+}
+
+// ─── Screen-share UI block ──────────────────────────────────────────────
+// Slot rendered inside the modal whenever the call is live. Shows the
+// share/stop button, the latest captured thumbnail, the privacy notice,
+// and the latest one-line summary the model returned.
+function ScreenShareBlock({ v }) {
+  const sharing  = v.screenStatus === 'sharing'
+  const asking   = v.screenStatus === 'asking'
+  const denied   = v.screenStatus === 'denied'
+  const stopped  = v.screenStatus === 'stopped'
+  const errored  = v.screenStatus === 'error'
+
+  return (
+    <div className="mt-5 w-full bg-surface-secondary rounded-xl p-3 text-left">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-1.5">
+          <Eye size={13} className="text-primary" />
+          <span className="text-[11.5px] font-bold text-txt-primary">Share screen with Setu</span>
+        </div>
+        {sharing && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> LIVE
+          </span>
+        )}
+      </div>
+
+      {/* Privacy notice — always visible */}
+      <div className="flex items-start gap-2 p-2 rounded-lg bg-warn-light/60 border border-warn/30 mb-2">
+        <ShieldAlert size={13} className="text-warn-text flex-shrink-0 mt-0.5" />
+        <p className="text-[10.5px] text-warn-text leading-snug">
+          Only share the Pravasi Setu tab/window. Do not share your full screen if sensitive information is visible.
+        </p>
+      </div>
+
+      {/* Action button */}
+      {!sharing && (
+        <button
+          onClick={v.startScreenShare}
+          disabled={asking}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white text-[12.5px] font-bold py-2.5 transition-colors disabled:opacity-50"
+        >
+          {asking ? <><Loader2 size={14} className="animate-spin" /> Asking permission…</>
+                  : <><Monitor size={14} /> Share screen</>}
+        </button>
+      )}
+      {sharing && (
+        <button
+          onClick={v.stopScreenShare}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-pill bg-red-600 hover:bg-red-700 text-white text-[12.5px] font-bold py-2.5"
+        >
+          <MonitorOff size={14} /> Stop sharing
+        </button>
+      )}
+
+      {/* Status hints */}
+      {denied && (
+        <p className="text-[10.5px] text-red-700 mt-2 leading-snug">
+          Screen-share permission was dismissed. Click <span className="font-bold">Share screen</span> again and pick a tab or window.
+        </p>
+      )}
+      {errored && (
+        <p className="text-[10.5px] text-red-700 mt-2 leading-snug">
+          Couldn't start screen capture. Your browser may not support it — try the latest Chrome / Edge.
+        </p>
+      )}
+      {stopped && !sharing && (
+        <p className="text-[10.5px] text-txt-secondary mt-2 leading-snug">
+          Sharing stopped. Setu won't see your screen until you start again.
+        </p>
+      )}
+
+      {/* Thumbnail preview + summary */}
+      {sharing && (
+        <div className="mt-2 grid grid-cols-[96px,1fr] gap-2 items-stretch">
+          <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-black/80 border border-bdr">
+            {v.screenPreviewDataUrl ? (
+              <img
+                src={v.screenPreviewDataUrl}
+                alt="Screen preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white/60 text-[9px]">
+                Loading…
+              </div>
+            )}
+          </div>
+          <div className="text-[10.5px] text-txt-secondary leading-snug bg-white rounded-lg border border-bdr-light p-2">
+            <div className="font-bold text-txt-primary uppercase tracking-wide text-[9px] mb-0.5">Setu sees</div>
+            {v.screenSummary || 'Looking at your screen…'}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

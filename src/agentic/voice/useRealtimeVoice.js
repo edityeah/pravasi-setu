@@ -272,6 +272,15 @@ export function useRealtimeVoice() {
     setStatus('ended')
   }, [cleanup])
 
+  // Send an arbitrary event into the OpenAI Realtime data channel. Used by
+  // the screen-share pipeline to push visual-context notes into the live
+  // session without having to reconnect. Returns true on success.
+  const sendEvent = useCallback((payload) => {
+    const dc = dataChannelRef.current
+    if (!dc || dc.readyState !== 'open') return false
+    try { dc.send(JSON.stringify(payload)); return true } catch { return false }
+  }, [])
+
   return {
     status: effectiveStatus,
     muted,
@@ -282,6 +291,7 @@ export function useRealtimeVoice() {
     start,
     end,
     toggleMute,
+    sendEvent,
     reset: () => { setStatus('idle'); setError(null); setErrorMessage(null); setTranscript([]) },
   }
 }

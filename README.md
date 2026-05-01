@@ -74,6 +74,51 @@ extra config is required.
 - WebRTC SDP exchange happens directly between the browser and OpenAI using
   the ephemeral key — our backend is not in the audio path.
 
+### Screen sharing — visual context for the voice assistant
+
+During a call, the user can click **Share screen** in the modal. The browser
+opens its native picker (tab / window / full screen) and the chosen stream is
+piped through a hidden `<video>` element. Every ~3 seconds we draw the latest
+frame onto a hidden `<canvas>`, encode it as a downscaled JPEG, and POST it to
+[`/api/analyze-screen`](api/analyze-screen.js).
+
+The endpoint forwards the frame to GPT-4o-mini vision with a tight prompt that
+asks for a one-sentence summary ("User is on Find Jobs viewing 3 verified
+electrician jobs in Dubai; the Apply button is highlighted on the first
+card"). The summary is then injected back into the live realtime session via
+the existing data channel as a silent `[VISUAL CONTEXT]` note. Setu treats
+those notes as awareness only — it never reads them aloud, but uses them to
+guide the user step-by-step on their next question.
+
+Why this architecture?
+- The Realtime API does not currently accept image input over WebRTC, so we
+  use a server-side fallback (analyze → summary → inject) instead of streaming
+  pixels into the live audio session.
+- All OpenAI calls (both realtime session minting AND vision analysis) stay
+  behind serverless functions — the browser never sees `OPENAI_API_KEY`.
+- Captured frames live in memory only. They are forwarded to OpenAI in-line
+  and immediately dropped — never logged, never persisted.
+- Frames are downscaled to a max longest edge of 1024px and JPEG-compressed
+  at q=0.7, keeping vision token cost low (`detail: "low"`).
+
+Privacy notice (shown in the modal):
+
+> Only share the Pravasi Setu tab/window. Do not share your full screen if
+> sensitive information is visible.
+
+Limitations:
+- ~1 frame every 3 seconds — slower changes will be missed; rapid UI changes
+  may not be captured. Tune `FRAME_INTERVAL_MS` in `useScreenShare.js` if you
+  need faster updates (and accept the higher OpenAI cost).
+- Mobile browsers (iOS Safari especially) do not implement
+  `getDisplayMedia` — the share button shows an "unsupported" hint there.
+- Vision summaries are best-effort. The voice persona is instructed to
+  verify with the user when the summary looks ambiguous and never to invent
+  numbers / fees / eligibility from a screenshot.
+- Cost: each frame ≈ 85 vision tokens with `detail: "low"`. A 5-minute
+  share-on call is roughly 100 frames → check your OpenAI dashboard if you
+  leave it running for long stretches.
+
 ### Voice-agent persona
 
 System instructions live in [api/_persona.js](api/_persona.js) and are sent
